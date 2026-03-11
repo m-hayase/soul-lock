@@ -11,11 +11,13 @@ const authenticated = ref(false)
 const password = ref('')
 const error = ref(false)
 const shaking = ref(false)
+const ready = ref(false)
 
 onMounted(() => {
   if (sessionStorage.getItem('auth') === 'ok') {
     authenticated.value = true
   }
+  setTimeout(() => { ready.value = true }, 100)
 })
 
 async function hashPassword(pw) {
@@ -43,25 +45,26 @@ async function submit() {
 </script>
 
 <template>
-  <!-- Authenticated: show custom home or default layout -->
   <template v-if="authenticated">
     <HomePage v-if="frontmatter.layout === 'home'" />
     <Layout v-else />
   </template>
 
-  <!-- Password gate -->
-  <div v-else class="gate">
-    <div class="gate-bg">
-      <div class="gate-orb o1" />
-      <div class="gate-orb o2" />
+  <div v-else class="gate" :class="{ ready }">
+    <!-- Soul orbs -->
+    <div class="soul-field">
+      <div class="soul s1" />
+      <div class="soul s2" />
+      <div class="soul s3" />
+      <div class="soul s4" />
+      <div class="soul s5" />
     </div>
 
-    <div class="gate-box" :class="{ shake: shaking }">
+    <div class="gate-card" :class="{ shake: shaking }">
       <div class="gate-logo">SOUL.lock</div>
-      <div class="gate-divider" />
-      <p class="gate-desc">Enter password to continue</p>
+      <p class="gate-sub">Still the soul remains</p>
       <form @submit.prevent="submit">
-        <div class="input-wrap" :class="{ 'has-error': error }">
+        <div class="input-row" :class="{ err: error }">
           <input
             v-model="password"
             type="password"
@@ -69,180 +72,169 @@ async function submit() {
             autofocus
           />
           <button type="submit">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
         </div>
       </form>
-      <p v-if="error" class="error-msg">Invalid password</p>
+      <p v-if="error" class="error-text">Invalid password</p>
     </div>
   </div>
 </template>
 
 <style scoped>
 .gate {
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  background: #0a0a0a;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+  background: #f8f8fa;
   position: relative;
   overflow: hidden;
+  opacity: 0;
+  transition: opacity 1s ease;
 }
+.gate.ready { opacity: 1; }
 
-.gate-bg {
+/* Soul orbs - ethereal floating blobs */
+.soul-field {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-.gate-orb {
+.soul {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
+  filter: blur(60px);
+  opacity: 0.5;
 }
 
-.o1 {
-  width: 400px;
-  height: 400px;
-  top: -10%;
-  right: -5%;
-  background: rgba(99,102,241,0.12);
-  animation: orbFloat1 8s ease-in-out infinite;
+.s1 {
+  width: 350px; height: 350px;
+  top: -5%; right: 10%;
+  background: radial-gradient(circle, rgba(167,139,250,0.4), transparent 70%);
+  animation: drift1 14s ease-in-out infinite;
+}
+.s2 {
+  width: 250px; height: 250px;
+  bottom: 10%; left: 5%;
+  background: radial-gradient(circle, rgba(129,140,248,0.35), transparent 70%);
+  animation: drift2 18s ease-in-out infinite;
+}
+.s3 {
+  width: 200px; height: 200px;
+  top: 40%; left: 30%;
+  background: radial-gradient(circle, rgba(196,181,253,0.3), transparent 70%);
+  animation: drift3 12s ease-in-out infinite;
+}
+.s4 {
+  width: 180px; height: 180px;
+  top: 15%; left: 50%;
+  background: radial-gradient(circle, rgba(165,180,252,0.25), transparent 70%);
+  animation: drift4 16s ease-in-out infinite;
+}
+.s5 {
+  width: 300px; height: 300px;
+  bottom: -5%; right: 30%;
+  background: radial-gradient(circle, rgba(199,210,254,0.35), transparent 70%);
+  animation: drift5 20s ease-in-out infinite;
 }
 
-.o2 {
-  width: 300px;
-  height: 300px;
-  bottom: -10%;
-  left: -5%;
-  background: rgba(139,92,246,0.08);
-  animation: orbFloat2 10s ease-in-out infinite;
+@keyframes drift1 {
+  0%,100% { transform: translate(0,0) scale(1); }
+  25% { transform: translate(-30px,40px) scale(1.1); }
+  50% { transform: translate(20px,60px) scale(0.95); }
+  75% { transform: translate(-15px,20px) scale(1.05); }
+}
+@keyframes drift2 {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(40px,-30px) scale(1.08); }
+  66% { transform: translate(-20px,-50px) scale(0.92); }
+}
+@keyframes drift3 {
+  0%,100% { transform: translate(0,0); }
+  50% { transform: translate(50px,-40px); }
+}
+@keyframes drift4 {
+  0%,100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(-40px,30px) scale(1.15); }
+}
+@keyframes drift5 {
+  0%,100% { transform: translate(0,0); }
+  33% { transform: translate(30px,-20px); }
+  66% { transform: translate(-20px,40px); }
 }
 
-@keyframes orbFloat1 {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(-20px, 20px); }
-}
-
-@keyframes orbFloat2 {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(15px, -15px); }
-}
-
-.gate-box {
-  text-align: center;
+/* Frosted glass card */
+.gate-card {
   position: relative;
   z-index: 2;
-  padding: 3.5rem 3rem;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 20px;
-  backdrop-filter: blur(20px);
+  text-align: center;
+  padding: 3rem 2.5rem;
   max-width: 380px;
   width: 90%;
-  animation: gateIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  background: rgba(255,255,255,0.55);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid rgba(255,255,255,0.7);
+  border-radius: 24px;
+  box-shadow: 0 8px 40px rgba(99,102,241,0.08), 0 1px 3px rgba(0,0,0,0.04);
+  animation: cardIn 1s cubic-bezier(0.16,1,0.3,1) 0.3s both;
 }
 
-@keyframes gateIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+@keyframes cardIn {
+  from { opacity:0; transform: translateY(30px) scale(0.97); }
+  to { opacity:1; transform: translateY(0) scale(1); }
 }
 
-.shake {
-  animation: shakeAnim 0.6s ease both;
-}
-
-@keyframes shakeAnim {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-10px); }
-  40% { transform: translateX(10px); }
-  60% { transform: translateX(-6px); }
-  80% { transform: translateX(6px); }
+.shake { animation: shakeX 0.5s ease both; }
+@keyframes shakeX {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
 }
 
 .gate-logo {
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, #fff 0%, #818cf8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #1e1b4b;
 }
-
-.gate-divider {
-  width: 40px;
-  height: 1px;
-  background: rgba(99,102,241,0.4);
-  margin: 1.5rem auto;
-}
-
-.gate-desc {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.35);
-  letter-spacing: 0.08em;
-  margin-bottom: 2rem;
-}
-
-.input-wrap {
-  display: flex;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
-  overflow: hidden;
-  transition: border-color 0.3s ease;
-}
-
-.input-wrap:focus-within {
-  border-color: rgba(99,102,241,0.5);
-}
-
-.input-wrap.has-error {
-  border-color: rgba(239,68,68,0.5);
-}
-
-.input-wrap input {
-  flex: 1;
-  padding: 14px 16px;
-  background: transparent;
-  border: none;
-  color: #fafafa;
-  font-size: 1rem;
-  outline: none;
-  letter-spacing: 0.1em;
-}
-
-.input-wrap input::placeholder {
-  color: rgba(255,255,255,0.2);
-}
-
-.input-wrap button {
-  padding: 14px 18px;
-  background: transparent;
-  border: none;
-  color: rgba(255,255,255,0.4);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-}
-
-.input-wrap button:hover {
-  color: #818cf8;
-}
-
-.error-msg {
+.gate-sub {
   font-size: 0.8rem;
-  color: rgba(239,68,68,0.8);
-  margin-top: 1rem;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.12em;
+  color: #94a3b8;
+  margin: 0.6rem 0 2rem;
+}
+
+.input-row {
+  display: flex;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(12px);
+  transition: border-color 0.3s;
+}
+.input-row:focus-within { border-color: rgba(99,102,241,0.4); }
+.input-row.err { border-color: rgba(239,68,68,0.4); }
+
+.input-row input {
+  flex:1; padding: 14px 16px; border:none; background:transparent;
+  font-size: 0.95rem; color: #1e1b4b; outline:none;
+}
+.input-row input::placeholder { color: #cbd5e1; }
+
+.input-row button {
+  padding: 14px 16px; border:none; background:transparent;
+  color: #94a3b8; cursor:pointer; display:flex; align-items:center;
+  transition: color 0.3s;
+}
+.input-row button:hover { color: #6366f1; }
+
+.error-text {
+  font-size: 0.78rem; color: #ef4444; margin-top: 0.8rem; letter-spacing: 0.04em;
 }
 </style>

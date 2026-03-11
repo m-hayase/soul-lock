@@ -1,37 +1,22 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 
-const heroRef = ref(null)
-const sectionsRef = ref([])
-const mouseX = ref(0)
-const mouseY = ref(0)
-const scrollY = ref(0)
 const loaded = ref(false)
 const titleChars = ref([])
 const subtitleVisible = ref(false)
 const taglineVisible = ref(false)
-const scrollIndicatorVisible = ref(false)
+const scrollIndicator = ref(false)
+const mouseX = ref(0)
+const mouseY = ref(0)
 
 const title = 'SOUL.lock'
 const subtitle = 'Still the soul remains'
 const tagline = 'After AIにおける新しい社会を作る'
 
 const features = [
-  {
-    num: '01',
-    title: '業務網羅性',
-    desc: 'チャット・CRM・会計・人事・購買・在庫など40以上のモジュールを統合。すべての業務を一つのプラットフォームで。',
-  },
-  {
-    num: '02',
-    title: 'AI業務完結',
-    desc: 'AIエージェントが定型業務を自動処理。人間は判断と承認に集中し、創造的な仕事に時間を使える。',
-  },
-  {
-    num: '03',
-    title: 'データ主権',
-    desc: 'テナント単位でデータを完全分離。セキュリティとプライバシーを確保し、安心して利用できる基盤。',
-  },
+  { num: '01', title: '業務網羅性', desc: 'チャット・CRM・会計・人事・購買・在庫など40以上のモジュールを統合。すべての業務を一つのプラットフォームで。' },
+  { num: '02', title: 'AI業務完結', desc: 'AIエージェントが定型業務を自動処理。人間は判断と承認に集中し、創造的な仕事に時間を使える。' },
+  { num: '03', title: 'データ主権', desc: 'テナント単位でデータを完全分離。セキュリティとプライバシーを確保し、安心して利用できる基盤。' },
 ]
 
 const stats = [
@@ -40,840 +25,663 @@ const stats = [
   { value: '100%', label: 'Data Isolation' },
 ]
 
-let rafId = null
+let observer = null
 
-function onMouseMove(e) {
+function onMouse(e) {
   mouseX.value = (e.clientX / window.innerWidth - 0.5) * 2
   mouseY.value = (e.clientY / window.innerHeight - 0.5) * 2
 }
 
-function onScroll() {
-  scrollY.value = window.scrollY
-}
-
-function initCharAnimation() {
-  title.split('').forEach((char, i) => {
-    setTimeout(() => {
-      titleChars.value.push(char)
-    }, 100 + i * 80)
+function initTitle() {
+  title.split('').forEach((c, i) => {
+    setTimeout(() => { titleChars.value.push(c) }, 120 + i * 90)
   })
-  setTimeout(() => { subtitleVisible.value = true }, 100 + title.length * 80 + 300)
-  setTimeout(() => { taglineVisible.value = true }, 100 + title.length * 80 + 800)
-  setTimeout(() => { scrollIndicatorVisible.value = true }, 100 + title.length * 80 + 1400)
+  const base = 120 + title.length * 90
+  setTimeout(() => { subtitleVisible.value = true }, base + 400)
+  setTimeout(() => { taglineVisible.value = true }, base + 900)
+  setTimeout(() => { scrollIndicator.value = true }, base + 1500)
 }
-
-// Intersection Observer for scroll-triggered animations
-let observer = null
 
 function setupObserver() {
   observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('in-view')
-      }
-    })
-  }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' })
-
-  document.querySelectorAll('.observe').forEach(el => {
-    observer.observe(el)
-  })
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in-view') })
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' })
+  document.querySelectorAll('.obs').forEach(el => observer.observe(el))
 }
 
 onMounted(() => {
-  window.addEventListener('mousemove', onMouseMove)
-  window.addEventListener('scroll', onScroll, { passive: true })
-
-  setTimeout(() => {
-    loaded.value = true
-    initCharAnimation()
-  }, 200)
-
-  setTimeout(() => {
-    setupObserver()
-  }, 500)
+  window.addEventListener('mousemove', onMouse)
+  setTimeout(() => { loaded.value = true; initTitle() }, 200)
+  setTimeout(setupObserver, 600)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('mousemove', onMouseMove)
-  window.removeEventListener('scroll', onScroll)
+  window.removeEventListener('mousemove', onMouse)
   if (observer) observer.disconnect()
-  if (rafId) cancelAnimationFrame(rafId)
 })
 </script>
 
 <template>
-  <div class="site" :class="{ loaded }">
-    <!-- Cursor follower -->
-    <div
-      class="cursor-glow"
-      :style="{
-        transform: `translate(${mouseX * 30}px, ${mouseY * 30}px)`
-      }"
-    />
+<div class="page" :class="{ loaded }">
 
-    <!-- HERO -->
-    <section ref="heroRef" class="hero">
-      <div class="hero-bg">
-        <div
-          class="hero-gradient g1"
-          :style="{ transform: `translate(${mouseX * 15}px, ${mouseY * 15}px)` }"
-        />
-        <div
-          class="hero-gradient g2"
-          :style="{ transform: `translate(${mouseX * -10}px, ${mouseY * -10}px)` }"
-        />
-        <div
-          class="hero-gradient g3"
-          :style="{ transform: `translate(${mouseX * 8}px, ${mouseY * -12}px)` }"
-        />
-      </div>
-
-      <!-- Grid lines -->
-      <div class="grid-overlay">
-        <div class="grid-line v" v-for="i in 5" :key="'v'+i" :style="{ left: `${i * 16.66}%` }" />
-        <div class="grid-line h" v-for="i in 3" :key="'h'+i" :style="{ top: `${i * 25}%` }" />
-      </div>
-
-      <div class="hero-content">
-        <div class="hero-label observe">
-          <span class="label-line" />
-          <span class="label-text">ソウルロック</span>
-        </div>
-
-        <h1 class="hero-title">
-          <span
-            v-for="(char, i) in titleChars"
-            :key="i"
-            class="char"
-            :style="{ animationDelay: `${i * 0.05}s` }"
-          >{{ char === ' ' ? '\u00A0' : char }}</span>
-        </h1>
-
-        <p class="hero-subtitle" :class="{ visible: subtitleVisible }">
-          {{ subtitle }}
-        </p>
-
-        <p class="hero-tagline" :class="{ visible: taglineVisible }">
-          {{ tagline }}
-        </p>
-
-        <div class="hero-cta" :class="{ visible: taglineVisible }">
-          <a href="#features" class="btn-primary">
-            <span>Explore</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M7 17L17 7M17 7H7M17 7V17"/>
-            </svg>
-          </a>
-        </div>
-      </div>
-
-      <div class="scroll-indicator" :class="{ visible: scrollIndicatorVisible }">
-        <div class="scroll-line" />
-        <span>Scroll</span>
-      </div>
-    </section>
-
-    <!-- STATS BAR -->
-    <section class="stats-bar">
-      <div class="stats-inner">
-        <div v-for="(stat, i) in stats" :key="i" class="stat observe">
-          <span class="stat-value">{{ stat.value }}</span>
-          <span class="stat-label">{{ stat.label }}</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- FEATURES -->
-    <section id="features" class="features">
-      <div class="section-header observe">
-        <span class="section-num">001</span>
-        <h2>What we build</h2>
-      </div>
-
-      <div class="features-grid">
-        <div
-          v-for="(feature, i) in features"
-          :key="i"
-          class="feature-card observe"
-          :style="{ transitionDelay: `${i * 0.15}s` }"
-        >
-          <div class="feature-num">{{ feature.num }}</div>
-          <h3>{{ feature.title }}</h3>
-          <p>{{ feature.desc }}</p>
-          <div class="feature-line" />
-        </div>
-      </div>
-    </section>
-
-    <!-- VISION -->
-    <section class="vision">
-      <div class="vision-inner">
-        <div class="vision-text observe">
-          <span class="section-num">002</span>
-          <h2 class="vision-heading">
-            AIと人間が<br/>
-            <span class="accent">共創する未来</span>を<br/>
-            実装する
-          </h2>
-        </div>
-        <div class="vision-desc observe">
-          <p>
-            私たちは、AIが人間の能力を拡張し、
-            すべての人がより創造的な仕事に集中できる社会を目指しています。
-            テクノロジーは手段であり、目的は人間の可能性の解放です。
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- MARQUEE -->
-    <section class="marquee-section">
-      <div class="marquee-track">
-        <div class="marquee-content">
-          <span v-for="i in 8" :key="i">
-            SOUL.lock — Still the soul remains —&nbsp;
-          </span>
-        </div>
-      </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="site-footer">
-      <div class="footer-inner">
-        <div class="footer-brand">
-          <span class="footer-logo">SOUL.lock</span>
-          <span class="footer-copy">&copy; 2026 Soul.lock</span>
-        </div>
-        <div class="footer-tagline">
-          Still the soul remains
-        </div>
-      </div>
-    </footer>
+  <!-- ========== SOUL BACKGROUND ========== -->
+  <div class="soul-bg" aria-hidden="true">
+    <div class="soul a" :style="{ transform: `translate(${mouseX*12}px, ${mouseY*12}px)` }" />
+    <div class="soul b" :style="{ transform: `translate(${mouseX*-8}px, ${mouseY*-8}px)` }" />
+    <div class="soul c" :style="{ transform: `translate(${mouseX*6}px, ${mouseY*-10}px)` }" />
+    <div class="soul d" />
+    <div class="soul e" />
+    <div class="soul f" />
+    <div class="soul g" />
+    <!-- Wisp trails -->
+    <div class="wisp w1" />
+    <div class="wisp w2" />
+    <div class="wisp w3" />
   </div>
+
+  <!-- ========== HERO ========== -->
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="hero-label obs">
+        <span class="label-line" />
+        <span>ソウルロック</span>
+      </p>
+
+      <h1 class="hero-title">
+        <span v-for="(c, i) in titleChars" :key="i" class="ch" :style="{ animationDelay: i*0.04+'s' }">{{ c }}</span>
+      </h1>
+
+      <p class="hero-sub" :class="{ show: subtitleVisible }">{{ subtitle }}</p>
+      <p class="hero-tag" :class="{ show: taglineVisible }">{{ tagline }}</p>
+
+      <div class="hero-cta" :class="{ show: taglineVisible }">
+        <a href="#features" class="btn">
+          <span>Explore</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="scroll-hint" :class="{ show: scrollIndicator }">
+      <div class="scroll-dot" />
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- ========== STATS ========== -->
+  <section class="stats">
+    <div class="stats-row">
+      <div v-for="(s, i) in stats" :key="i" class="stat-item obs glass-panel" :style="{ transitionDelay: i*0.12+'s' }">
+        <span class="stat-val">{{ s.value }}</span>
+        <span class="stat-lbl">{{ s.label }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FEATURES ========== -->
+  <section id="features" class="features">
+    <div class="sec-head obs">
+      <span class="sec-num">001</span>
+      <h2>What we build</h2>
+    </div>
+    <div class="feat-grid">
+      <div v-for="(f, i) in features" :key="i" class="feat-card glass-panel obs" :style="{ transitionDelay: i*0.15+'s' }">
+        <span class="feat-num">{{ f.num }}</span>
+        <h3>{{ f.title }}</h3>
+        <p>{{ f.desc }}</p>
+        <div class="feat-accent" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== VISION ========== -->
+  <section class="vision">
+    <div class="vision-card glass-panel obs">
+      <span class="sec-num">002</span>
+      <h2>AIと人間が<br/><span class="gradient-text">共創する未来</span>を<br/>実装する</h2>
+      <p class="vision-body">
+        私たちは、AIが人間の能力を拡張し、すべての人がより創造的な仕事に集中できる社会を目指しています。テクノロジーは手段であり、目的は人間の可能性の解放です。
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== MARQUEE ========== -->
+  <section class="marquee">
+    <div class="marquee-track">
+      <div class="marquee-slide">
+        <span v-for="i in 10" :key="i">SOUL.lock — Still the soul remains —&nbsp;</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="foot">
+    <div class="foot-inner glass-panel">
+      <div>
+        <span class="foot-logo">SOUL.lock</span>
+        <span class="foot-copy">&copy; 2026 Soul.lock</span>
+      </div>
+      <span class="foot-tag">Still the soul remains</span>
+    </div>
+  </footer>
+
+</div>
 </template>
 
 <style scoped>
-/* ===== BASE ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* ===== RESET & BASE ===== */
+* { margin:0; padding:0; box-sizing:border-box; }
 
-.site {
-  background: #0a0a0a;
-  color: #fafafa;
+.page {
+  min-height: 100vh;
+  background: #f8f8fa;
+  color: #1e1b4b;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
   overflow-x: hidden;
   opacity: 0;
   transition: opacity 0.8s ease;
 }
+.page.loaded { opacity: 1; }
 
-.site.loaded {
-  opacity: 1;
+/* ===== GLASS PANEL ===== */
+.glass-panel {
+  background: rgba(255,255,255,0.5);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  border: 1px solid rgba(255,255,255,0.7);
+  border-radius: 20px;
+  box-shadow: 0 4px 30px rgba(99,102,241,0.06), 0 1px 2px rgba(0,0,0,0.03);
 }
 
-/* ===== CURSOR GLOW ===== */
-.cursor-glow {
+/* ===== SOUL BACKGROUND ===== */
+.soul-bg {
   position: fixed;
-  top: 20%;
-  left: 30%;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%);
-  border-radius: 50%;
+  inset: 0;
   pointer-events: none;
-  z-index: 1;
-  transition: transform 0.3s ease-out;
+  z-index: 0;
+}
+
+.soul {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  transition: transform 0.5s ease-out;
+}
+
+.soul.a {
+  width: 500px; height: 500px;
+  top: -8%; right: 5%;
+  background: radial-gradient(circle, rgba(167,139,250,0.3) 0%, rgba(167,139,250,0) 70%);
+  animation: soulA 16s ease-in-out infinite;
+}
+.soul.b {
+  width: 400px; height: 400px;
+  bottom: 5%; left: -3%;
+  background: radial-gradient(circle, rgba(129,140,248,0.25) 0%, transparent 70%);
+  animation: soulB 20s ease-in-out infinite;
+}
+.soul.c {
+  width: 350px; height: 350px;
+  top: 35%; left: 25%;
+  background: radial-gradient(circle, rgba(196,181,253,0.2) 0%, transparent 70%);
+  animation: soulC 14s ease-in-out infinite;
+}
+.soul.d {
+  width: 250px; height: 250px;
+  top: 60%; right: 15%;
+  background: radial-gradient(circle, rgba(165,180,252,0.22) 0%, transparent 70%);
+  animation: soulD 18s ease-in-out infinite;
+}
+.soul.e {
+  width: 200px; height: 200px;
+  top: 10%; left: 40%;
+  background: radial-gradient(circle, rgba(224,231,255,0.35) 0%, transparent 70%);
+  animation: soulE 22s ease-in-out infinite;
+}
+.soul.f {
+  width: 300px; height: 300px;
+  bottom: 25%; right: 35%;
+  background: radial-gradient(circle, rgba(199,210,254,0.2) 0%, transparent 70%);
+  animation: soulF 15s ease-in-out infinite;
+}
+.soul.g {
+  width: 180px; height: 180px;
+  top: 70%; left: 55%;
+  background: radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%);
+  animation: soulG 17s ease-in-out infinite;
+}
+
+/* Soul wisps — thin elongated shapes */
+.wisp {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.3;
+}
+.w1 {
+  width: 600px; height: 80px;
+  top: 30%; left: -10%;
+  background: linear-gradient(90deg, transparent, rgba(167,139,250,0.2), transparent);
+  animation: wispDrift1 12s ease-in-out infinite;
+  transform: rotate(-8deg);
+}
+.w2 {
+  width: 500px; height: 60px;
+  top: 55%; right: -5%;
+  background: linear-gradient(90deg, transparent, rgba(129,140,248,0.18), transparent);
+  animation: wispDrift2 15s ease-in-out infinite;
+  transform: rotate(5deg);
+}
+.w3 {
+  width: 400px; height: 50px;
+  top: 80%; left: 20%;
+  background: linear-gradient(90deg, transparent, rgba(196,181,253,0.15), transparent);
+  animation: wispDrift3 18s ease-in-out infinite;
+  transform: rotate(-3deg);
+}
+
+@keyframes soulA {
+  0%,100% { transform: translate(0,0) scale(1); opacity:0.3; }
+  30% { transform: translate(-40px,50px) scale(1.12); opacity:0.45; }
+  60% { transform: translate(20px,80px) scale(0.95); opacity:0.3; }
+}
+@keyframes soulB {
+  0%,100% { transform: translate(0,0) scale(1); }
+  40% { transform: translate(50px,-40px) scale(1.1); }
+  70% { transform: translate(-20px,-60px) scale(0.9); }
+}
+@keyframes soulC {
+  0%,100% { transform: translate(0,0); }
+  50% { transform: translate(60px,-50px); }
+}
+@keyframes soulD {
+  0%,100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(-50px,40px) scale(1.15); }
+}
+@keyframes soulE {
+  0%,100% { transform: translate(0,0) scale(1); opacity:0.35; }
+  50% { transform: translate(30px,40px) scale(1.2); opacity:0.5; }
+}
+@keyframes soulF {
+  0%,100% { transform: translate(0,0); }
+  33% { transform: translate(40px,-30px); }
+  66% { transform: translate(-30px,20px); }
+}
+@keyframes soulG {
+  0%,100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(-35px,-25px) scale(1.1); }
+}
+@keyframes wispDrift1 {
+  0%,100% { transform: rotate(-8deg) translateX(0); opacity: 0.2; }
+  50% { transform: rotate(-8deg) translateX(80px); opacity: 0.4; }
+}
+@keyframes wispDrift2 {
+  0%,100% { transform: rotate(5deg) translateX(0); opacity: 0.15; }
+  50% { transform: rotate(5deg) translateX(-60px); opacity: 0.35; }
+}
+@keyframes wispDrift3 {
+  0%,100% { transform: rotate(-3deg) translateX(0); }
+  50% { transform: rotate(-3deg) translateX(50px); }
+}
+
+/* ===== OBSERVER ANIMATIONS ===== */
+.obs {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+}
+.obs.in-view {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* ===== HERO ===== */
 .hero {
   position: relative;
+  z-index: 1;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
 }
-
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
-
-.hero-gradient {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  transition: transform 0.4s ease-out;
-}
-
-.g1 {
-  width: 600px;
-  height: 600px;
-  top: -10%;
-  right: -5%;
-  background: rgba(99,102,241,0.15);
-  animation: pulse1 8s ease-in-out infinite;
-}
-
-.g2 {
-  width: 500px;
-  height: 500px;
-  bottom: -10%;
-  left: -5%;
-  background: rgba(139,92,246,0.12);
-  animation: pulse2 10s ease-in-out infinite;
-}
-
-.g3 {
-  width: 400px;
-  height: 400px;
-  top: 40%;
-  left: 40%;
-  background: rgba(59,130,246,0.08);
-  animation: pulse3 12s ease-in-out infinite;
-}
-
-@keyframes pulse1 {
-  0%, 100% { transform: scale(1); opacity: 0.15; }
-  50% { transform: scale(1.2); opacity: 0.25; }
-}
-@keyframes pulse2 {
-  0%, 100% { transform: scale(1); opacity: 0.12; }
-  50% { transform: scale(1.15); opacity: 0.2; }
-}
-@keyframes pulse3 {
-  0%, 100% { transform: scale(1) translate(0,0); }
-  50% { transform: scale(1.1) translate(20px, -20px); }
-}
-
-/* Grid overlay */
-.grid-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.grid-line {
-  position: absolute;
-  background: rgba(255,255,255,0.03);
-}
-
-.grid-line.v {
-  width: 1px;
-  height: 100%;
-  top: 0;
-}
-
-.grid-line.h {
-  height: 1px;
-  width: 100%;
-  left: 0;
-}
-
-/* Hero content */
-.hero-content {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  padding: 0 2rem;
-}
+.hero-inner { text-align: center; padding: 0 2rem; }
 
 .hero-label {
   display: inline-flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 2rem;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  font-size: 0.82rem;
+  letter-spacing: 0.2em;
+  color: #94a3b8;
 }
-
-.hero-label.in-view {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 .label-line {
   display: block;
-  width: 40px;
-  height: 1px;
-  background: rgba(99,102,241,0.6);
-}
-
-.label-text {
-  font-size: 0.85rem;
-  letter-spacing: 0.2em;
-  color: rgba(255,255,255,0.5);
-  text-transform: uppercase;
+  width: 36px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(99,102,241,0.5));
 }
 
 .hero-title {
   font-size: clamp(3.5rem, 10vw, 8rem);
   font-weight: 700;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   line-height: 1;
   margin-bottom: 1.5rem;
-  min-height: 1.2em;
+  min-height: 1.1em;
 }
 
-.char {
+.ch {
   display: inline-block;
-  animation: charIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-  background: linear-gradient(135deg, #fff 0%, #c7d2fe 50%, #818cf8 100%);
+  animation: charReveal 0.7s cubic-bezier(0.16,1,0.3,1) both;
+  background: linear-gradient(135deg, #1e1b4b 0%, #6366f1 60%, #a78bfa 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-@keyframes charIn {
-  from {
-    opacity: 0;
-    transform: translateY(60px) rotateX(40deg);
-    filter: blur(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) rotateX(0);
-    filter: blur(0);
-  }
+@keyframes charReveal {
+  from { opacity:0; transform: translateY(50px) scale(0.8); filter: blur(12px); }
+  to { opacity:1; transform: translateY(0) scale(1); filter: blur(0); }
 }
 
-.hero-subtitle {
-  font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+.hero-sub {
+  font-size: clamp(1.05rem, 2.2vw, 1.5rem);
   font-weight: 300;
-  color: rgba(255,255,255,0.7);
   letter-spacing: 0.15em;
-  margin-bottom: 1rem;
+  color: #64748b;
+  margin-bottom: 0.8rem;
   opacity: 0;
-  transform: translateY(30px);
-  transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(25px);
+  transition: all 1s cubic-bezier(0.16,1,0.3,1);
 }
+.hero-sub.show { opacity:1; transform: translateY(0); }
 
-.hero-subtitle.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.hero-tagline {
-  font-size: clamp(0.95rem, 1.8vw, 1.2rem);
-  color: rgba(255,255,255,0.4);
-  letter-spacing: 0.05em;
+.hero-tag {
+  font-size: clamp(0.9rem, 1.6vw, 1.1rem);
+  color: #94a3b8;
+  letter-spacing: 0.04em;
   margin-bottom: 2.5rem;
   opacity: 0;
-  transform: translateY(30px);
-  transition: all 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
+  transform: translateY(25px);
+  transition: all 1s cubic-bezier(0.16,1,0.3,1) 0.15s;
 }
-
-.hero-tagline.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+.hero-tag.show { opacity:1; transform: translateY(0); }
 
 .hero-cta {
   opacity: 0;
   transform: translateY(20px);
-  transition: all 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
+  transition: all 1s cubic-bezier(0.16,1,0.3,1) 0.3s;
 }
+.hero-cta.show { opacity:1; transform: translateY(0); }
 
-.hero-cta.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.btn-primary {
+.btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 14px 32px;
-  background: rgba(99,102,241,0.15);
-  border: 1px solid rgba(99,102,241,0.3);
+  padding: 13px 30px;
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(99,102,241,0.2);
   border-radius: 100px;
-  color: #c7d2fe;
+  color: #4f46e5;
   text-decoration: none;
-  font-size: 0.95rem;
-  letter-spacing: 0.08em;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   transition: all 0.4s ease;
-  position: relative;
-  overflow: hidden;
+  box-shadow: 0 2px 16px rgba(99,102,241,0.08);
+}
+.btn:hover {
+  background: rgba(99,102,241,0.1);
+  border-color: rgba(99,102,241,0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(99,102,241,0.15);
 }
 
-.btn-primary::before {
-  content: '';
+/* Scroll hint */
+.scroll-hint {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(99,102,241,0.3), rgba(139,92,246,0.3));
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  border-radius: inherit;
-}
-
-.btn-primary:hover {
-  border-color: rgba(99,102,241,0.6);
-  transform: scale(1.05);
-}
-
-.btn-primary:hover::before {
-  opacity: 1;
-}
-
-.btn-primary span,
-.btn-primary svg {
-  position: relative;
-  z-index: 1;
-}
-
-/* Scroll indicator */
-.scroll-indicator {
-  position: absolute;
-  bottom: 3rem;
+  bottom: 2.5rem;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   opacity: 0;
   transition: opacity 1s ease;
   z-index: 2;
 }
+.scroll-hint.show { opacity:1; }
 
-.scroll-indicator.visible {
-  opacity: 1;
+.scroll-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(99,102,241,0.4);
+  animation: dotBounce 2s ease-in-out infinite;
 }
-
-.scroll-line {
-  width: 1px;
-  height: 60px;
-  background: linear-gradient(to bottom, rgba(99,102,241,0.6), transparent);
-  animation: scrollPulse 2s ease-in-out infinite;
+@keyframes dotBounce {
+  0%,100% { transform: translateY(0); opacity:1; }
+  50% { transform: translateY(12px); opacity:0.3; }
 }
-
-@keyframes scrollPulse {
-  0%, 100% { transform: scaleY(1); opacity: 1; }
-  50% { transform: scaleY(0.5); opacity: 0.4; }
-}
-
-.scroll-indicator span {
-  font-size: 0.7rem;
+.scroll-hint span {
+  font-size: 0.65rem;
   letter-spacing: 0.2em;
-  color: rgba(255,255,255,0.3);
+  color: #cbd5e1;
   text-transform: uppercase;
 }
 
-/* ===== STATS BAR ===== */
-.stats-bar {
-  border-top: 1px solid rgba(255,255,255,0.06);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+/* ===== STATS ===== */
+.stats {
+  position: relative;
+  z-index: 1;
   padding: 3rem 2rem;
 }
-
-.stats-inner {
+.stats-row {
   max-width: 900px;
   margin: 0 auto;
   display: flex;
-  justify-content: space-around;
+  gap: 1.5rem;
+  justify-content: center;
 }
-
-.stat {
+.stat-item {
+  flex: 1;
   text-align: center;
-  opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 2rem 1.5rem;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
-
-.stat.in-view {
-  opacity: 1;
-  transform: translateY(0);
+.stat-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 36px rgba(99,102,241,0.1);
 }
-
-.stat-value {
+.stat-val {
   display: block;
-  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-size: clamp(2rem, 3.5vw, 3rem);
   font-weight: 700;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, #fff, #818cf8);
+  background: linear-gradient(135deg, #4f46e5, #818cf8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-
-.stat-label {
-  font-size: 0.8rem;
-  letter-spacing: 0.15em;
-  color: rgba(255,255,255,0.35);
-  text-transform: uppercase;
-  margin-top: 0.5rem;
+.stat-lbl {
   display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-top: 0.4rem;
 }
 
 /* ===== FEATURES ===== */
 .features {
-  padding: 8rem 2rem;
-  max-width: 1200px;
+  position: relative;
+  z-index: 1;
+  padding: 6rem 2rem;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
-.section-header {
-  margin-bottom: 4rem;
-  opacity: 0;
-  transform: translateY(40px);
-  transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.section-header.in-view {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.section-num {
+.sec-head { margin-bottom: 3.5rem; }
+.sec-num {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   letter-spacing: 0.2em;
-  color: rgba(99,102,241,0.6);
-  margin-bottom: 1rem;
+  color: rgba(99,102,241,0.5);
+  margin-bottom: 0.8rem;
   font-family: monospace;
 }
-
-.section-header h2 {
-  font-size: clamp(2rem, 4vw, 3rem);
+.sec-head h2 {
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
   font-weight: 600;
   letter-spacing: -0.02em;
 }
 
-.features-grid {
+.feat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
 }
 
-.feature-card {
+.feat-card {
   padding: 2.5rem;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 16px;
   position: relative;
   overflow: hidden;
-  opacity: 0;
-  transform: translateY(50px);
-  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.5s cubic-bezier(0.16,1,0.3,1), box-shadow 0.5s ease;
+  cursor: default;
+}
+.feat-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 48px rgba(99,102,241,0.12), 0 1px 2px rgba(0,0,0,0.03);
 }
 
-.feature-card.in-view {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.feature-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, transparent 60%);
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-
-.feature-card:hover::before {
-  opacity: 1;
-}
-
-.feature-card:hover {
-  border-color: rgba(99,102,241,0.2);
-  transform: translateY(-8px);
-}
-
-.feature-num {
-  font-size: 0.75rem;
+.feat-num {
+  font-size: 0.7rem;
   letter-spacing: 0.15em;
-  color: rgba(99,102,241,0.5);
+  color: rgba(99,102,241,0.4);
   font-family: monospace;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.2rem;
+  display: block;
 }
-
-.feature-card h3 {
-  font-size: 1.4rem;
+.feat-card h3 {
+  font-size: 1.3rem;
   font-weight: 600;
-  margin-bottom: 1rem;
-  position: relative;
+  margin-bottom: 0.8rem;
+}
+.feat-card p {
+  font-size: 0.92rem;
+  line-height: 1.85;
+  color: #64748b;
 }
 
-.feature-card p {
-  font-size: 0.95rem;
-  line-height: 1.8;
-  color: rgba(255,255,255,0.5);
-  position: relative;
-}
-
-.feature-line {
+.feat-accent {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(99,102,241,0.6), transparent);
-  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  bottom: 0; left: 0;
+  width: 0; height: 2px;
+  background: linear-gradient(90deg, rgba(99,102,241,0.5), rgba(167,139,250,0.3), transparent);
+  transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
 }
-
-.feature-card:hover .feature-line {
-  width: 100%;
-}
+.feat-card:hover .feat-accent { width: 100%; }
 
 /* ===== VISION ===== */
 .vision {
-  padding: 10rem 2rem;
   position: relative;
+  z-index: 1;
+  padding: 6rem 2rem;
+  display: flex;
+  justify-content: center;
 }
-
-.vision::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 800px;
-  height: 800px;
-  background: radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%);
-  pointer-events: none;
+.vision-card {
+  max-width: 700px;
+  width: 100%;
+  padding: 4rem 3.5rem;
+  text-align: center;
 }
-
-.vision-inner {
-  max-width: 1000px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  align-items: center;
-}
-
-.vision-text {
-  opacity: 0;
-  transform: translateX(-40px);
-  transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.vision-text.in-view {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.vision-heading {
-  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+.vision-card h2 {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
   font-weight: 600;
-  line-height: 1.5;
-  letter-spacing: -0.01em;
+  line-height: 1.6;
+  margin: 1rem 0 1.5rem;
 }
-
-.accent {
-  background: linear-gradient(135deg, #818cf8, #a78bfa);
+.gradient-text {
+  background: linear-gradient(135deg, #6366f1, #a78bfa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-
-.vision-desc {
-  opacity: 0;
-  transform: translateX(40px);
-  transition: all 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
-}
-
-.vision-desc.in-view {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.vision-desc p {
-  font-size: 1.05rem;
+.vision-body {
+  font-size: 0.95rem;
   line-height: 2;
-  color: rgba(255,255,255,0.5);
+  color: #64748b;
 }
 
 /* ===== MARQUEE ===== */
-.marquee-section {
-  border-top: 1px solid rgba(255,255,255,0.06);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  padding: 2rem 0;
+.marquee {
+  position: relative;
+  z-index: 1;
+  padding: 1.8rem 0;
   overflow: hidden;
+  border-top: 1px solid rgba(0,0,0,0.04);
+  border-bottom: 1px solid rgba(0,0,0,0.04);
 }
-
 .marquee-track {
   display: flex;
   width: max-content;
 }
-
-.marquee-content {
+.marquee-slide {
   display: flex;
-  animation: marquee 20s linear infinite;
   white-space: nowrap;
+  animation: slide 25s linear infinite;
 }
-
-.marquee-content span {
-  font-size: clamp(1rem, 2vw, 1.4rem);
+.marquee-slide span {
+  font-size: clamp(0.85rem, 1.5vw, 1.1rem);
   letter-spacing: 0.1em;
-  color: rgba(255,255,255,0.15);
-  font-weight: 300;
+  color: rgba(0,0,0,0.08);
+  font-weight: 400;
 }
-
-@keyframes marquee {
+@keyframes slide {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
 
 /* ===== FOOTER ===== */
-.site-footer {
-  padding: 4rem 2rem;
+.foot {
+  position: relative;
+  z-index: 1;
+  padding: 3rem 2rem;
 }
-
-.footer-inner {
-  max-width: 1200px;
+.foot-inner {
+  max-width: 1100px;
   margin: 0 auto;
+  padding: 2.5rem;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
 }
-
-.footer-logo {
+.foot-logo {
   display: block;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin-bottom: 0.5rem;
+  color: #1e1b4b;
+  margin-bottom: 0.3rem;
 }
-
-.footer-copy {
+.foot-copy {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+.foot-tag {
   font-size: 0.8rem;
-  color: rgba(255,255,255,0.3);
-}
-
-.footer-tagline {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.2);
-  letter-spacing: 0.1em;
+  color: #cbd5e1;
+  letter-spacing: 0.08em;
 }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
-  .vision-inner {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-
-  .stats-inner {
-    flex-direction: column;
-    gap: 2rem;
-  }
-
-  .features-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .footer-inner {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2rem;
-  }
+  .stats-row { flex-direction: column; gap: 1rem; }
+  .feat-grid { grid-template-columns: 1fr; }
+  .vision-card { padding: 2.5rem 2rem; }
+  .foot-inner { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
 }
 </style>
