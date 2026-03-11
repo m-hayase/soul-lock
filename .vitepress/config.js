@@ -3,6 +3,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'Communication',
   description: 'AI-Powered Business Platform',
+  base: '/communication-docs/',
   lang: 'ja',
   themeConfig: {
     nav: [
