@@ -3,7 +3,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'SOUL.lock',
   description: 'AI-Powered Business Platform',
-  base: '/communication-docs/',
+  base: '/soul-lock/',
   lang: 'ja',
   themeConfig: {
     nav: [
