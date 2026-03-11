@@ -1,15 +1,16 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useData } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
+import HomePage from './HomePage.vue'
 
 const { Layout } = DefaultTheme
+const { frontmatter } = useData()
 
 const authenticated = ref(false)
 const password = ref('')
 const error = ref(false)
-
-// SHA-256 hash of "soul"
-const HASH = 'a]dvnW' // placeholder, we use simple comparison via hashing
+const shaking = ref(false)
 
 onMounted(() => {
   if (sessionStorage.getItem('auth') === 'ok') {
@@ -25,7 +26,6 @@ async function hashPassword(pw) {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
 }
 
-// SHA-256 of "soul"
 const EXPECTED = 'ae0facccf0a3723adefbdfe700c097b6c843dbfd06e5cd325602ec13b2361f8b'
 
 async function submit() {
@@ -36,26 +36,46 @@ async function submit() {
     error.value = false
   } else {
     error.value = true
+    shaking.value = true
+    setTimeout(() => { shaking.value = false }, 600)
   }
 }
 </script>
 
 <template>
-  <Layout v-if="authenticated" />
+  <!-- Authenticated: show custom home or default layout -->
+  <template v-if="authenticated">
+    <HomePage v-if="frontmatter.layout === 'home'" />
+    <Layout v-else />
+  </template>
+
+  <!-- Password gate -->
   <div v-else class="gate">
-    <div class="gate-box">
-      <h1>Soul.lock</h1>
-      <p>このサイトはパスワードで保護されています</p>
+    <div class="gate-bg">
+      <div class="gate-orb o1" />
+      <div class="gate-orb o2" />
+    </div>
+
+    <div class="gate-box" :class="{ shake: shaking }">
+      <div class="gate-logo">SOUL.lock</div>
+      <div class="gate-divider" />
+      <p class="gate-desc">Enter password to continue</p>
       <form @submit.prevent="submit">
-        <input
-          v-model="password"
-          type="password"
-          placeholder="パスワードを入力"
-          autofocus
-        />
-        <button type="submit">Enter</button>
+        <div class="input-wrap" :class="{ 'has-error': error }">
+          <input
+            v-model="password"
+            type="password"
+            placeholder="Password"
+            autofocus
+          />
+          <button type="submit">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
       </form>
-      <p v-if="error" class="error">パスワードが正しくありません</p>
+      <p v-if="error" class="error-msg">Invalid password</p>
     </div>
   </div>
 </template>
@@ -66,59 +86,163 @@ async function submit() {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: #f6f6f7;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #0a0a0a;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+  position: relative;
+  overflow: hidden;
 }
+
+.gate-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.gate-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.o1 {
+  width: 400px;
+  height: 400px;
+  top: -10%;
+  right: -5%;
+  background: rgba(99,102,241,0.12);
+  animation: orbFloat1 8s ease-in-out infinite;
+}
+
+.o2 {
+  width: 300px;
+  height: 300px;
+  bottom: -10%;
+  left: -5%;
+  background: rgba(139,92,246,0.08);
+  animation: orbFloat2 10s ease-in-out infinite;
+}
+
+@keyframes orbFloat1 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-20px, 20px); }
+}
+
+@keyframes orbFloat2 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(15px, -15px); }
+}
+
 .gate-box {
   text-align: center;
-  background: #fff;
-  padding: 3rem 2.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  position: relative;
+  z-index: 2;
+  padding: 3.5rem 3rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
   max-width: 380px;
   width: 90%;
+  animation: gateIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-.gate-box h1 {
-  margin: 0 0 0.5rem;
-  font-size: 1.8rem;
-  color: #1a1a1a;
+
+@keyframes gateIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
-.gate-box p {
-  margin: 0 0 1.5rem;
-  color: #666;
-  font-size: 0.9rem;
+
+.shake {
+  animation: shakeAnim 0.6s ease both;
 }
-.gate-box form {
+
+@keyframes shakeAnim {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(10px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+
+.gate-logo {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #fff 0%, #818cf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gate-divider {
+  width: 40px;
+  height: 1px;
+  background: rgba(99,102,241,0.4);
+  margin: 1.5rem auto;
+}
+
+.gate-desc {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.08em;
+  margin-bottom: 2rem;
+}
+
+.input-wrap {
   display: flex;
-  gap: 0.5rem;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.3s ease;
 }
-.gate-box input {
+
+.input-wrap:focus-within {
+  border-color: rgba(99,102,241,0.5);
+}
+
+.input-wrap.has-error {
+  border-color: rgba(239,68,68,0.5);
+}
+
+.input-wrap input {
   flex: 1;
-  padding: 0.6rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  padding: 14px 16px;
+  background: transparent;
+  border: none;
+  color: #fafafa;
   font-size: 1rem;
   outline: none;
-  transition: border-color 0.2s;
+  letter-spacing: 0.1em;
 }
-.gate-box input:focus {
-  border-color: #3451b2;
+
+.input-wrap input::placeholder {
+  color: rgba(255,255,255,0.2);
 }
-.gate-box button {
-  padding: 0.6rem 1.2rem;
-  background: #3451b2;
-  color: #fff;
+
+.input-wrap button {
+  padding: 14px 18px;
+  background: transparent;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  color: rgba(255,255,255,0.4);
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
 }
-.gate-box button:hover {
-  background: #2c3e8f;
+
+.input-wrap button:hover {
+  color: #818cf8;
 }
-.error {
-  color: #e53e3e !important;
-  margin-top: 1rem !important;
+
+.error-msg {
+  font-size: 0.8rem;
+  color: rgba(239,68,68,0.8);
+  margin-top: 1rem;
+  letter-spacing: 0.05em;
 }
 </style>
