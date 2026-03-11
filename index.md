@@ -2,8 +2,8 @@
 layout: home
 hero:
   name: Communication
-  text: AI-Powered Business Platform
-  tagline: 業務の全領域をカバーするAI統合型ビジネスプラットフォーム
+  text: Still the soul remains
+  tagline: by Soul.lock — AI統合型ビジネスプラットフォーム
   actions:
     - theme: brand
       text: Features

@@ -44,7 +44,7 @@ async function submit() {
   <Layout v-if="authenticated" />
   <div v-else class="gate">
     <div class="gate-box">
-      <h1>Communication</h1>
+      <h1>Soul.lock</h1>
       <p>このサイトはパスワードで保護されています</p>
       <form @submit.prevent="submit">
         <input
