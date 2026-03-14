@@ -69,7 +69,7 @@ async function submit() {
             autofocus
           />
           <button type="submit">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <i class="material-icons-outlined" style="font-size: 18px;">arrow_forward</i>
           </button>
         </div>
       </form>

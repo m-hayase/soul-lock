@@ -1,5 +1,8 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
+import NetworkAnimation from "./NetworkAnimation.vue";
+import AiEvidenceSection from "./AiEvidenceSection.vue";
+import VcQaSection from "./VcQaSection.vue";
 
 const loaded = ref(false);
 const titleLinesVisible = ref([false, false, false]);
@@ -20,95 +23,126 @@ const logoName = "Soul.lock";
 const brandName = "Still the soul remains";
 const titleLines = ["Soul.lock"];
 const subtitle = "After AI";
-const tagline = "AIで幸福な社会を作る";
+const tagline = "機能の価値がゼロになる時代、データ統合だけが残る";
 const heroCta = "Talk to us";
 
 // --- Problem ---
-const problemHeading = "AIを受け入れる、\n準備をしよう";
+const problemHeading = "機能の価値は、\nゼロになる";
 const problems = [
     {
-        icon: "⚡",
-        num: "290兆円",
-        label: "日本の雇用者報酬",
-        desc: "人件費そのものが潜在市場",
+        num: "トークン化",
+        label: "開発コストの崩壊",
+        desc: "システム開発・保守・サポートがトークンに置き換わる。誰でも同等の機能を構築できる時代が来る",
     },
     {
-        icon: "📉",
-        num: "69%",
-        label: "DX未着手企業",
-        desc: "中小企業の約7割がDXに未着手。業務のデジタル化すら進んでいない現実",
-        note: "※中小企業庁調べ",
+        num: "データ統合",
+        label: "AIが機能する唯一の条件",
+        desc: "分散したデータではAIは部分最適しかできない。全業務が単一DBに統合されて初めて、AIは横断的に判断・実行できる",
     },
     {
-        icon: "🔄",
-        num: "47%",
-        label: "定型業務の割合",
-        desc: "ホワイトカラーの業務時間の約半分が、AIで代替可能な定型作業に費やされている",
+        num: "必然",
+        label: "誰かが必ずやる",
+        desc: "この事実に気づけば、答えはALL-IN-ONEに行き着く。ならば、我々がやる",
     },
 ];
 
 const solutions = [
     {
         num: "01",
-        title: "仮想業務空間",
-        desc: "AIが業務を自律的に遂行する新しいワークスペース。人間は意思決定と創造に集中する。",
+        title: "AIプロフェッショナル",
+        desc: "モジュールごとに専門AIが常駐。会計・人事・営業のプロとして対話し、業務を実行する。スキル層が処理し、システム層がデータの健全性を担保する3層構造。",
     },
     {
         num: "02",
-        title: "業務全領域カバー",
-        desc: "営業・会計・人事・購買——断片化したSaaSを統合し、すべての業務をひとつの空間で完結させる。",
+        title: "ALL-IN-ONE統合基盤",
+        desc: "20分野・230超の業務機能・600超のデータモデルが単一DBに統合。連携コストゼロでAIが業務全体を横断参照。コア部分は約7割が完成済み。",
     },
     {
         num: "03",
-        title: "AI-Native設計",
-        desc: "既存SaaSへのAI後付けではない。AIが前提のアーキテクチャで、業務プロセスそのものを再定義する。",
+        title: "NEO SNS — 完全情報マーケット",
+        desc: "企業の完全情報を掲載し、信用スコアとAI比較で取引先が選ばれる。ハッタリが通用しない透明な市場。載っていない企業は選択肢に入らなくなる。",
     },
 ];
 
 const advantages = [
     {
-        value: "2週間",
-        label: "プロトタイプ開発",
-        desc: "アイデアから動くプロダクトまで。AI駆動の開発速度。",
+        value: "7割",
+        label: "コア完成済み",
+        desc: "20分野・230超の業務機能。600超のデータモデルが単一DBで稼働中。",
     },
     {
-        value: "Day 1",
-        label: "AI-Native",
-        desc: "後付けAIではない。設計思想からAIファースト。",
+        value: "最適解",
+        label: "複製不可能なデータ",
+        desc: "業務×スキル×モデルの最適化データが蓄積。後発には複製できない企業価値の核。",
     },
     {
-        value: "全業務",
-        label: "ワンプラットフォーム",
-        desc: "断片化した業務SaaSを統合する唯一の選択肢。",
+        value: "NW効果",
+        label: "完全情報マーケット",
+        desc: "企業間AI取引+信用スコア+JPYコイン決済。参加圧力で指数関数的に拡大。",
     },
 ];
 
+// --- Modules (完成済み汎用モジュール) ---
+const modules = [
+    { icon: "account_balance", name: "会計・財務", features: "仕訳・元帳・決算・経費・固定資産・予実・請求・見積・消込・自動仕訳" },
+    { icon: "badge", name: "人事・労務・給与", features: "勤怠・シフト・有給・残業・給与計算・賞与・手当・評価・OKR・オンボーディング" },
+    { icon: "handshake", name: "営業・CRM・MA", features: "商談・パイプライン・リードスコアリング・メールシーケンス・A/Bテスト" },
+    { icon: "local_shipping", name: "購買・在庫", features: "発注・分納・仕入先評価・倉庫管理・ロット・BOM・組立・原価積層" },
+    { icon: "forum", name: "コミュニケーション", features: "チャット・メール・Wiki・ファイル管理・カレンダー・施設予約" },
+    { icon: "task_alt", name: "業務基盤", features: "タスク・ワークフロー・多段階承認・契約・プロジェクト・AI基盤・分析" },
+];
+
+// --- Industry Example (業種別適応の一例としてVC) ---
+const industryExample = {
+    title: "業種別適応例 — VCエコシステム",
+    sub: "汎用モジュールの上に業種特化機能がシームレスに連携。64モデル・35サービスが単一DBで繋がる",
+    groups: [
+        {
+            icon: "account_balance",
+            name: "VCファンド運営",
+            items: "IC・キャピタルコール・ウォーターフォール・IRR/TVPI自動算出・マネジメントフィー・LP四半期報告",
+        },
+        {
+            icon: "people",
+            name: "LP管理",
+            items: "LPポータル・資本勘定明細書・セカンダリー取引・税務書類・GP-LP通信",
+        },
+        {
+            icon: "rocket_launch",
+            name: "ポートフォリオ企業",
+            items: "キャップテーブル・ストックオプション・KPI(MRR/ARR/NDR等)・EXIT準備・取締役会・ESG評価",
+        },
+    ],
+    flow: "KPI報告 → バリュエーション自動更新 → ファンドNAV・IRR即時反映 → LPポータルでリアルタイム確認 → 四半期報告書に自動統合",
+};
+
 // --- Solution ---
 const solutionHeading = "What we build";
-const solutionSub = "AIが業務を遂行する、まったく新しいワークスペース";
+const solutionSub = "AIが業務を遂行することを前提にゼロから設計された統合業務プラットフォーム";
 const screenshotLabel = "Product Preview — Confidential";
 
 // --- Why Us ---
 const whyHeading = "Why SOUL.lock";
 
 // --- Vision ---
-const visionQuote = "人間の魂が宿る仕事だけを、人間がやる世界をつくる";
+const visionQuote = "あるべき姿から逆算して設計する。現在の延長線上には、この答えはない";
 const founderName = "早瀬 基二";
 const founderRole = "Founder & CEO";
-const stageLabel = "Pre-Seed — Building the future of work";
+const stageLabel = "Pre-Seed — 2026年8月ローンチ目標";
 
 // --- CTA ---
 const ctaHeading = "Let's talk";
 const ctaDesc =
-    "30分のミーティングで、仮想業務空間のデモとビジネスモデルをご説明します";
+    "30分のミーティングで、実動作デモとビジネスモデルをご説明します";
 const ctaButton = "ミーティングを予約する";
-const ctaEmail = "hello@example.com";
+const ctaEmail = "contact@because-and.com";
 
 // --- Nav Menu ---
 const navLinks = [
-    { text: "Message", href: "/soul-lock/message" },
-    { text: "Profile", href: "/soul-lock/profile" },
-    { text: "Contact", href: "/soul-lock/contact" },
+    { text: "ビジョン", href: "/soul-lock/vision/" },
+    { text: "メッセージ", href: "/soul-lock/message" },
+    { text: "プロフィール", href: "/soul-lock/profile" },
+    { text: "コンタクト", href: "/soul-lock/contact" },
 ];
 
 // --- Footer ---
@@ -176,6 +210,9 @@ onUnmounted(() => {
 
 <template>
     <div class="page" :class="{ loaded }">
+        <!-- ========== NETWORK ANIMATION (削除時: このブロックとimportを消すだけ) ========== -->
+        <NetworkAnimation />
+
         <!-- ========== SOUL BACKGROUND ========== -->
         <div class="soul-bg" aria-hidden="true">
             <div
@@ -243,16 +280,7 @@ onUnmounted(() => {
                 <div class="hero-cta" :class="{ show: taglineVisible }">
                     <a href="#contact" class="btn-primary">
                         <span>{{ heroCta }}</span>
-                        <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <path d="M7 17L17 7M17 7H7M17 7V17" />
-                        </svg>
+                        <i class="material-icons-outlined" style="font-size: 16px;">north_east</i>
                     </a>
                 </div>
             </div>
@@ -333,11 +361,65 @@ onUnmounted(() => {
             </div>
         </section>
 
-        <!-- ========== 4. WHY US ========== -->
+        <!-- ========== 3.5 MODULES ========== -->
+        <section class="slide modules-section">
+            <div class="modules-inner">
+                <div class="sec-head obs">
+                    <span class="sec-num">003</span>
+                    <h2>20分野・230超の業務機能</h2>
+                    <p class="sec-sub">コア部分は約7割が完成。600超のデータモデルが単一DBに統合済み</p>
+                </div>
+                <div class="modules-grid">
+                    <div
+                        v-for="(m, i) in modules"
+                        :key="i"
+                        class="module-card glass-panel obs"
+                        :style="{ transitionDelay: i * 0.1 + 's' }"
+                    >
+                        <div class="module-header">
+                            <i class="material-icons-outlined module-icon">{{ m.icon }}</i>
+                            <h3>{{ m.name }}</h3>
+                        </div>
+                        <p class="module-features">{{ m.features }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 3.6 INDUSTRY EXAMPLE ========== -->
+        <section class="slide industry-section">
+            <div class="industry-inner">
+                <div class="sec-head obs">
+                    <span class="sec-num">004</span>
+                    <h2>{{ industryExample.title }}</h2>
+                    <p class="sec-sub">{{ industryExample.sub }}</p>
+                </div>
+                <div class="industry-grid">
+                    <div
+                        v-for="(g, i) in industryExample.groups"
+                        :key="i"
+                        class="industry-card glass-panel obs"
+                        :style="{ transitionDelay: i * 0.12 + 's' }"
+                    >
+                        <div class="industry-card-header">
+                            <i class="material-icons-outlined industry-icon">{{ g.icon }}</i>
+                            <h3>{{ g.name }}</h3>
+                        </div>
+                        <p class="industry-items">{{ g.items }}</p>
+                    </div>
+                </div>
+                <div class="industry-flow obs">
+                    <p class="industry-flow-label">ALL-IN-ONEだからできる横断連携</p>
+                    <p class="industry-flow-text">{{ industryExample.flow }}</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 5. WHY US ========== -->
         <section class="slide why-us">
             <div class="why-inner">
                 <div class="sec-head obs">
-                    <span class="sec-num">003</span>
+                    <span class="sec-num">005</span>
                     <h2>{{ whyHeading }}</h2>
                 </div>
                 <div class="why-grid">
@@ -355,10 +437,20 @@ onUnmounted(() => {
             </div>
         </section>
 
+        <!-- ========== 4.5 AI EVIDENCE ========== -->
+        <section class="slide carousel-slide">
+            <AiEvidenceSection />
+        </section>
+
+        <!-- ========== 4.6 VC Q&A ========== -->
+        <section class="slide carousel-slide">
+            <VcQaSection />
+        </section>
+
         <!-- ========== 5. VISION / TEAM ========== -->
         <section class="slide vision">
             <div class="vision-card glass-panel obs">
-                <span class="sec-num">004</span>
+                <span class="sec-num">006</span>
                 <blockquote class="vision-quote">
                     "{{ visionQuote }}"
                 </blockquote>
@@ -381,16 +473,7 @@ onUnmounted(() => {
                 <div class="cta-buttons">
                     <a :href="`mailto:${ctaEmail}`" class="btn-primary btn-lg">
                         <span>{{ ctaButton }}</span>
-                        <svg
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <path d="M7 17L17 7M17 7H7M17 7V17" />
-                        </svg>
+                        <i class="material-icons-outlined" style="font-size: 18px;">north_east</i>
                     </a>
                 </div>
                 <p class="cta-note">{{ ctaEmail }}</p>
@@ -799,13 +882,14 @@ onUnmounted(() => {
     margin-bottom: 2rem;
     font-size: 0.82rem;
     letter-spacing: 0.2em;
-    color: #999;
+    color: #555;
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
 }
 .label-line {
     display: block;
     width: 36px;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.25));
+    background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.4));
 }
 .hero-title {
     font-size: clamp(2.8rem, 8vw, 6rem);
@@ -813,6 +897,8 @@ onUnmounted(() => {
     letter-spacing: -0.03em;
     line-height: 1.15;
     margin-bottom: 2rem;
+    color: #000;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.9), 0 0 40px rgba(255, 255, 255, 0.5);
 }
 .title-line {
     display: block;
@@ -833,8 +919,9 @@ onUnmounted(() => {
     font-size: clamp(1.05rem, 2.2vw, 1.5rem);
     font-weight: 300;
     letter-spacing: 0.15em;
-    color: #555;
+    color: #222;
     margin-bottom: 0.8rem;
+    text-shadow: 0 0 16px rgba(255, 255, 255, 0.8);
     opacity: 0;
     transform: translateY(25px);
     transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
@@ -845,7 +932,8 @@ onUnmounted(() => {
 }
 .hero-tag {
     font-size: clamp(0.9rem, 1.6vw, 1.1rem);
-    color: #999;
+    color: #444;
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
     letter-spacing: 0.04em;
     margin-bottom: 2.5rem;
     opacity: 0;
@@ -1083,7 +1171,113 @@ onUnmounted(() => {
     margin-top: 1rem;
 }
 
-/* ===== 4. WHY US ===== */
+/* ===== 3.5 MODULES ===== */
+.modules-section {
+    flex-direction: column;
+    padding: 4rem 2rem;
+}
+.modules-inner {
+    max-width: 1100px;
+    width: 100%;
+}
+.modules-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem;
+}
+.module-card {
+    padding: 1.8rem 1.5rem;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.module-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 36px rgba(0, 0, 0, 0.06);
+}
+.module-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0.8rem;
+}
+.module-icon {
+    font-size: 1.3rem;
+    color: #9333ea;
+    opacity: 0.7;
+}
+.module-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+.module-features {
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: #888;
+}
+
+/* ===== 3.6 INDUSTRY EXAMPLE ===== */
+.industry-section {
+    flex-direction: column;
+    padding: 4rem 2rem;
+}
+.industry-inner {
+    max-width: 1100px;
+    width: 100%;
+}
+.industry-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+.industry-card {
+    padding: 2rem 1.8rem;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.industry-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 36px rgba(0, 0, 0, 0.06);
+}
+.industry-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0.8rem;
+}
+.industry-icon {
+    font-size: 1.3rem;
+    color: #4f46e5;
+    opacity: 0.7;
+}
+.industry-card-header h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+.industry-items {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: #666;
+}
+.industry-flow {
+    text-align: center;
+    padding: 1.5rem 2rem;
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+}
+.industry-flow-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    color: #999;
+    margin-bottom: 0.5rem;
+}
+.industry-flow-text {
+    font-size: 0.9rem;
+    color: #555;
+    letter-spacing: 0.02em;
+}
+
+/* ===== 5. WHY US ===== */
 .why-us {
     flex-direction: column;
     padding: 4rem 2rem;
@@ -1106,15 +1300,15 @@ onUnmounted(() => {
     font-weight: 700;
     letter-spacing: -0.03em;
     color: #111;
+    line-height: 1.2;
 }
 .why-label {
-    margin-top: 0.5rem;
     display: block;
     font-size: 0.8rem;
     letter-spacing: 0.15em;
     color: #999;
     text-transform: uppercase;
-    margin: 0.3rem 0 1rem;
+    margin: 0.6rem 0 1rem;
 }
 .why-desc {
     font-size: 0.9rem;
@@ -1213,6 +1407,16 @@ onUnmounted(() => {
     letter-spacing: 0.04em;
 }
 
+/* ===== CAROUSEL SLIDES ===== */
+.carousel-slide {
+    scroll-snap-align: start;
+    padding: 2rem 1.5rem;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
 /* ===== FOOTER ===== */
 .foot-section {
     flex-direction: column;
@@ -1287,6 +1491,12 @@ onUnmounted(() => {
         gap: 1rem;
     }
     .solution-grid {
+        grid-template-columns: 1fr;
+    }
+    .modules-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .industry-grid {
         grid-template-columns: 1fr;
     }
     .why-grid {
